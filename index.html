@@ -1,0 +1,3827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeCode CSS — Lucid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RESET & ROOT
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #060606;
+  --bg-2:      #0a0a0a;
+  --bg-3:      #0f0f0f;
+  --surface:   #111111;
+  --surface-2: #161616;
+  --border:    rgba(255,255,255,0.06);
+  --border-2:  rgba(255,255,255,0.10);
+  --text:      rgba(255,255,255,0.90);
+  --text-2:    rgba(255,255,255,0.50);
+  --text-3:    rgba(255,255,255,0.28);
+  --accent:    #d4c5a9;
+  --accent-dim: rgba(212,197,169,0.15);
+  --accent-glow: rgba(212,197,169,0.06);
+  --font-serif: 'Cormorant Garamond', 'Georgia', serif;
+  --font-sans:  'DM Sans', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', 'Courier New', monospace;
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-silk:     cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.4, 0.58, 1);
+  --ease-bounce:   cubic-bezier(0.28, 1.48, 0.54, 1);
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap:     cubic-bezier(0.175, 0.885, 0.32, 1.35);
+}
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
+  font-optical-sizing: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   FILM GRAIN OVERLAY
+   ============================================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* Vignette */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  transition: opacity 1.2s var(--ease-editorial), visibility 1.2s;
+}
+
+#loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-wordmark {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 7vw, 4.5rem);
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text);
+  overflow: visible;
+  display: flex;
+  gap: 0em;
+}
+
+.loader-wordmark span {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(6px) scaleY(0.94);
+  animation: charResolve 1.8s var(--ease-out) forwards;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes charResolve {
+  to { opacity: 1; filter: blur(0px); transform: translateY(0) scaleY(1); }
+}
+
+.loader-line {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: lineGrow 2.2s var(--ease-editorial) 0.8s forwards;
+}
+
+@keyframes lineGrow {
+  to { width: 80px; }
+}
+
+.loader-sub {
+  font-family: var(--font-sans);
+  font-size: 0.5625rem;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  opacity: 0;
+  animation: resolveIn 1.2s var(--ease-out) 1.7s forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   AMBIENT BACKGROUND GLOW
+   ============================================================ */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-glow-1 {
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,197,169,0.025) 0%, transparent 65%);
+  top: -300px;
+  right: -150px;
+  animation: drift1 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.bg-glow-2 {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180,165,140,0.018) 0%, transparent 65%);
+  bottom: -200px;
+  left: -200px;
+  animation: drift2 36s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes drift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-80px, 100px) scale(1.06); }
+}
+
+@keyframes drift2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(100px, -80px) scale(1.04); }
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0 clamp(24px, 5vw, 80px);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.7s var(--ease-silk), background 0.7s var(--ease-silk);
+}
+
+nav.scrolled,
+nav.menu-open {
+  border-color: var(--border);
+  background: rgba(6,6,6,0.82);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+.nav-brand {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  opacity: 0;
+  animation: resolveIn 1.1s var(--ease-out) 2.2s forwards;
+  transition: opacity 0.35s;
+}
+
+.nav-brand:hover { opacity: 0.6; }
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  opacity: 0;
+  animation: resolveIn 1.1s var(--ease-out) 2.4s forwards;
+}
+
+.nav-link {
+  font-size: 0.6875rem;
+  color: var(--text-3);
+  text-decoration: none;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.35s var(--ease-silk);
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.45s var(--ease-editorial);
+}
+
+.nav-link:hover { color: var(--text); }
+.nav-link:hover::after { width: 100%; }
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  border-radius: 2px;
+  padding: 8px 16px 7px;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: opacity 0.35s, transform 0.45s var(--ease-spring), box-shadow 0.45s;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212,197,169,0.16);
+}
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+main {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 80px);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-top: 64px;
+  position: relative;
+}
+
+.hero-inner {
+  padding: clamp(80px, 12vw, 160px) 0 clamp(60px, 8vw, 120px);
+  max-width: 900px;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.5625rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: resolveIn 1.1s var(--ease-out) 2.5s forwards;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+.hero-headline {
+  font-family: var(--font-serif);
+  font-size: clamp(3.2rem, 8vw, 7.5rem);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 44px;
+  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
+}
+
+.hero-headline em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.hero-headline-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em; /* Prevent descender clipping */
+  margin-bottom: -0.08em; /* Compensate for added padding in rhythm */
+}
+
+.hero-headline-line span {
+  display: block;
+  transform: translateY(108%);
+  opacity: 0;
+  animation: lineReveal 1.5s var(--ease-editorial) forwards;
+  will-change: transform, opacity;
+}
+
+.hero-headline-line:nth-child(1) span { animation-delay: 2.7s; }
+.hero-headline-line:nth-child(2) span { animation-delay: 3.0s; }
+.hero-headline-line:nth-child(3) span { animation-delay: 3.3s; }
+
+@keyframes lineReveal {
+  from { transform: translateY(108%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.hero-body {
+  font-size: clamp(1rem, 1.35vw, 1.0625rem);
+  line-height: 1.88;
+  color: var(--text-2);
+  max-width: 500px;
+  margin-bottom: 56px;
+  font-weight: 300;
+  opacity: 0;
+  animation: resolveIn 1.3s var(--ease-out) 3.7s forwards;
+  letter-spacing: 0.005em;
+}
+
+.hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: resolveIn 1.3s var(--ease-out) 3.95s forwards;
+}
+
+@keyframes resolveIn {
+  from { opacity: 0; filter: blur(4px); transform: translateY(10px); }
+  to   { opacity: 1; filter: blur(0px); transform: translateY(0); }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  border-radius: 2px;
+  padding: 14px 24px 13px;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition: background 0.5s var(--ease-silk), box-shadow 0.5s var(--ease-silk), transform 0.55s var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 32px rgba(212,197,169,0.22), 0 2px 8px rgba(212,197,169,0.12);
+  transform: translateY(-4px) scale(1.045);
+  transition: box-shadow 0.5s var(--ease-silk), transform 0.95s var(--ease-bounce);
+}
+
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary svg { flex-shrink: 0; transition: transform 0.4s var(--ease-spring); }
+.btn-primary:hover svg { transform: translateY(2px); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-3);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 14px 0;
+  cursor: pointer;
+  text-decoration: none;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition: color 0.45s var(--ease-silk);
+  position: relative;
+}
+
+/* Animated underline */
+.btn-secondary::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background: var(--text-2);
+  transition: width 0.5s var(--ease-editorial);
+}
+
+.btn-secondary:hover { color: var(--text); }
+.btn-secondary:hover::after { width: calc(100% - 26px); }
+
+.btn-secondary svg {
+  transition: transform 0.5s var(--ease-spring);
+  opacity: 0.5;
+}
+.btn-secondary:hover svg {
+  transform: translateX(6px);
+  opacity: 1;
+}
+
+/* Hero scroll indicator */
+.hero-scroll {
+  position: absolute;
+  bottom: 44px;
+  left: clamp(24px, 5vw, 80px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  animation: fadeUp 0.9s var(--ease-out) 3s forwards;
+}
+
+.hero-scroll-line {
+  width: 36px;
+  height: 1px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-scroll-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.4;
+}
+
+.hero-scroll-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+/* ============================================================
+   DIVIDER MARKS
+   ============================================================ */
+.mark-divider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0 0 24px;
+}
+
+.mark-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.mark-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   WHAT IS VIBECODE SECTION
+   ============================================================ */
+#what {
+  padding: clamp(100px, 14vw, 180px) 0;
+  border-top: 1px solid var(--border);
+}
+
+.what-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(48px, 8vw, 120px);
+  align-items: start;
+}
+
+.what-left h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 32px;
+}
+
+.what-left h2 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+.what-left p {
+  font-size: 0.9375rem;
+  line-height: 1.86;
+  color: var(--text-2);
+  margin-bottom: 20px;
+  font-weight: 300;
+  max-width: 480px;
+}
+
+.what-left p:last-child { margin-bottom: 0; }
+
+.what-right {
+  padding-top: 8px;
+}
+
+.concept-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 32px;
+  margin-bottom: 1px;
+  transition: border-color 0.5s var(--ease-silk), background 0.5s var(--ease-silk), transform 0.55s var(--ease-spring), box-shadow 0.5s var(--ease-silk);
+  position: relative;
+  overflow: hidden;
+}
+
+.concept-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,197,169,0.45), transparent);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-silk);
+}
+
+.concept-card:hover {
+  border-color: rgba(212,197,169,0.1);
+  background: var(--surface-2);
+  transform: translateX(9px) translateY(-3px) scale(1.018);
+  box-shadow: -4px 0 0 rgba(212,197,169,0.12), 0 10px 32px rgba(0,0,0,0.3);
+  transition:
+    border-color 0.4s var(--ease-silk),
+    background 0.4s var(--ease-silk),
+    transform 0.95s var(--ease-bounce),
+    box-shadow 0.95s var(--ease-bounce);
+}
+
+.concept-card:hover::before { opacity: 1; }
+
+.concept-num {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  color: rgba(212,197,169,0.45);
+  letter-spacing: 0.14em;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.concept-card h3 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: -0.005em;
+  line-height: 1.4;
+}
+
+.concept-card p {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  line-height: 1.78;
+  font-weight: 300;
+}
+
+/* ============================================================
+   GUIDE READER
+   ============================================================ */
+#guide {
+  padding: clamp(80px, 10vw, 140px) 0;
+  border-top: 1px solid var(--border);
+}
+
+.guide-header {
+  margin-bottom: clamp(48px, 6vw, 80px);
+}
+
+.guide-header h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.guide-header p {
+  font-size: 0.9375rem;
+  color: var(--text-2);
+  max-width: 460px;
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+.guide-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* TOC */
+.toc {
+  position: sticky;
+  top: 88px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.toc::-webkit-scrollbar { display: none; }
+
+.toc-title {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 20px;
+}
+
+.toc-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toc-item a {
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: var(--text-3);
+  text-decoration: none;
+  line-height: 1.5;
+  display: block;
+  padding: 5px 0 5px 14px;
+  border-left: 1px solid transparent;
+  transition: color 0.4s var(--ease-silk), border-color 0.4s var(--ease-silk), padding-left 0.35s var(--ease-spring);
+  letter-spacing: 0.005em;
+}
+
+.toc-item a:hover,
+.toc-item.active a {
+  color: var(--accent);
+  border-color: rgba(212,197,169,0.45);
+  padding-left: 22px;
+  transition: color 0.35s var(--ease-silk), border-color 0.35s var(--ease-silk), padding-left 0.9s var(--ease-bounce);
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212,197,169,0.4), var(--accent), rgba(212,197,169,0.6));
+  z-index: 2000;
+  width: 0%;
+  transition: width 0.15s linear;
+  box-shadow: 0 0 12px rgba(212,197,169,0.25);
+}
+
+/* Guide content */
+.guide-content {
+  min-width: 0;
+}
+
+.guide-section {
+  margin-bottom: clamp(72px, 10vw, 120px);
+  opacity: 0;
+  transform: translateY(28px) scale(0.978);
+  filter: blur(3px);
+  transition:
+    opacity 0.75s var(--ease-editorial),
+    transform 1.1s var(--ease-bounce),
+    filter 0.75s var(--ease-editorial),
+    clip-path 0.75s var(--ease-editorial);
+  clip-path: inset(0 0 6% 0);
+  will-change: opacity, transform, filter;
+}
+
+.guide-section.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0px);
+  clip-path: inset(0 0 0% 0);
+}
+
+.guide-section h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 32px;
+  line-height: 1.16;
+  scroll-margin-top: 100px;
+}
+
+.guide-section h3 {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 48px 0 16px;
+  opacity: 0.8;
+}
+
+.guide-section p {
+  font-size: 0.9375rem;
+  line-height: 1.86;
+  color: var(--text-2);
+  margin-bottom: 22px;
+  max-width: 640px;
+  font-weight: 300;
+}
+
+.guide-section ul,
+.guide-section ol {
+  margin: 0 0 28px 0;
+  padding-left: 0;
+  list-style: none;
+  max-width: 640px;
+}
+
+.guide-section li {
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--text-2);
+  padding: 8px 0 8px 24px;
+  position: relative;
+  border-bottom: none;
+  font-weight: 300;
+}
+
+.guide-section li:first-child {
+  border-top: none;
+}
+
+.guide-section li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.guide-section ol li { counter-increment: list-counter; }
+.guide-section ol li::before {
+  content: counter(list-counter, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.guide-section ol { counter-reset: list-counter; }
+
+/* Pullquote */
+.pullquote {
+  border-left: 1px solid rgba(212,197,169,0.35);
+  padding: 28px 36px;
+  margin: 48px 0;
+  background: rgba(212,197,169,0.025);
+  border-radius: 0;
+  position: relative;
+  max-width: 620px;
+}
+
+.pullquote p {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+  letter-spacing: -0.005em;
+}
+
+/* Callout */
+.callout {
+  background: rgba(255,255,255,0.016);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 24px 28px;
+  margin: 36px 0;
+  max-width: 620px;
+  position: relative;
+  overflow: hidden;
+}
+
+.callout::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+.callout-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(212,197,169,0.55);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.callout p {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.78;
+  font-weight: 300;
+}
+
+/* Code blocks */
+.code-block {
+  position: relative;
+  margin: 32px 0;
+  max-width: 620px;
+  background: rgba(4,4,4,1);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  transition: border-color 0.45s var(--ease-silk);
+}
+
+.code-block:hover {
+  border-color: var(--border-2);
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.012);
+}
+
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: color 0.35s var(--ease-silk), border-color 0.35s var(--ease-silk), background 0.35s var(--ease-silk);
+}
+
+.copy-btn:hover {
+  color: var(--accent);
+  border-color: rgba(212,197,169,0.2);
+  background: rgba(212,197,169,0.04);
+}
+
+.copy-btn.copied {
+  color: #7fbf7f;
+  border-color: rgba(127,191,127,0.2);
+  background: rgba(127,191,127,0.03);
+}
+
+.code-block pre {
+  padding: 24px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.06) transparent;
+}
+
+.code-block code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.65);
+  white-space: pre;
+  display: block;
+}
+
+/* Comparison table */
+.compare-table {
+  width: 100%;
+  max-width: 680px;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.875rem;
+}
+
+.compare-table th {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-table td {
+  padding: 12px 16px;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.compare-table td:first-child {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--accent);
+}
+
+.compare-table tr:hover td {
+  background: rgba(255,255,255,0.01);
+}
+
+/* ============================================================
+   DOWNLOAD SECTION
+   ============================================================ */
+#download {
+  padding: clamp(80px, 10vw, 140px) 0;
+  border-top: 1px solid var(--border);
+}
+
+.download-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(48px, 8vw, 100px);
+  align-items: center;
+}
+
+.download-text h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 22px;
+}
+
+.download-text p {
+  font-size: 0.9375rem;
+  line-height: 1.84;
+  color: var(--text-2);
+  margin-bottom: 18px;
+  font-weight: 300;
+}
+
+.download-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.6s var(--ease-silk), box-shadow 0.6s var(--ease-silk), transform 0.6s var(--ease-spring);
+}
+
+.download-card:hover {
+  border-color: rgba(212,197,169,0.12);
+  transform: translateY(-9px) scale(1.022);
+  box-shadow: 0 28px 72px rgba(0,0,0,0.45);
+  transition: border-color 0.5s var(--ease-silk), transform 1.0s var(--ease-bounce), box-shadow 1.0s var(--ease-bounce);
+}
+
+.download-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212,197,169,0.03) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.file-icon {
+  width: 44px;
+  height: 52px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.file-icon::after {
+  content: 'MD';
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.file-name {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 10px;
+  display: block;
+  letter-spacing: -0.01em;
+}
+
+.file-meta {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.file-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-meta-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.file-meta-value {
+  font-size: 0.8125rem;
+  font-weight: 300;
+  color: var(--text-2);
+}
+
+.file-desc {
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.78;
+  color: var(--text-2);
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 20px 15px;
+  background: var(--accent);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: box-shadow 0.5s var(--ease-silk), transform 0.55s var(--ease-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.download-btn:hover {
+  transform: translateY(-5px) scale(1.025);
+  box-shadow: 0 16px 48px rgba(212,197,169,0.2), 0 4px 12px rgba(212,197,169,0.1);
+  transition: transform 0.95s var(--ease-bounce), box-shadow 0.5s var(--ease-silk);
+}
+
+.download-btn-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bg);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.download-btn-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(0,0,0,0.12);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.45s var(--ease-spring);
+}
+
+.download-btn:hover .download-btn-icon { transform: translateY(2px); }
+
+/* Download active feedback */
+.download-btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   TOAST NOTIFICATION
+   ============================================================ */
+.toast-container {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(20,20,20,0.95);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 0.8125rem;
+  color: var(--text);
+  pointer-events: auto;
+  transform: translateY(20px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.6s var(--ease-spring), opacity 0.5s var(--ease-silk);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  min-width: 200px;
+  max-width: 300px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.04) inset;
+  letter-spacing: 0.01em;
+}
+
+.toast.show {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.toast-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7fbf7f;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 48px 0;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--text-3);
+  letter-spacing: 0.01em;
+}
+
+.footer-brand strong {
+  color: var(--text-2);
+  font-style: italic;
+  font-weight: 300;
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+.search-wrap {
+  position: relative;
+  max-width: 680px;
+  margin-bottom: 48px;
+}
+
+.search-input {
+  width: 100%;
+  background: rgba(255,255,255,0.018);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 13px 16px 13px 44px;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.45s var(--ease-silk), background 0.45s var(--ease-silk), box-shadow 0.45s;
+  letter-spacing: 0.02em;
+}
+
+.search-input::placeholder { color: var(--text-3); }
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-decoration,
+.search-input::-ms-clear { display: none; appearance: none; }
+
+.search-input:focus {
+  border-color: rgba(212,197,169,0.18);
+  background: rgba(255,255,255,0.024);
+  box-shadow: 0 0 0 1px rgba(212,197,169,0.05);
+}
+
+/* Extra right padding when search nav is visible */
+.search-wrap:has(.search-nav.visible) .search-input {
+  padding-right: 120px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+.search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 4px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.search-clear.visible { display: flex; }
+.search-clear:hover { color: var(--text); }
+
+/* Highlight */
+mark {
+  background: rgba(212,197,169,0.14);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 3px;
+  font-style: normal;
+}
+
+/* ============================================================
+   REVEAL ANIMATIONS — bouncy spring entry
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(32px) scale(0.965);
+  transition:
+    opacity 0.75s var(--ease-editorial),
+    transform 0.8s var(--ease-bounce),
+    filter 0.75s var(--ease-editorial);
+  will-change: transform, opacity, filter;
+}
+
+.reveal.visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0) scale(1);
+}
+
+.reveal-delay-1 { transition-delay: 0.14s; }
+.reveal-delay-2 { transition-delay: 0.28s; }
+.reveal-delay-3 { transition-delay: 0.42s; }
+
+/* ============================================================
+   SCROLL DEPTH TRANSITIONS — Sections dissolve into each other
+   ============================================================ */
+#what, #guide, #download {
+  transition: opacity 0.6s var(--ease-silk);
+}
+
+/* Section scene-change: slight scale retreat as you scroll past */
+.scene-transition {
+  transition: transform 0.8s var(--ease-silk), opacity 0.8s var(--ease-silk);
+  transform-origin: center bottom;
+}
+
+/* Subtle ambient column light in the hero area */
+#hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(212,197,169,0.04) 40%, rgba(212,197,169,0.02) 70%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .what-grid { grid-template-columns: 1fr; }
+  .download-inner { grid-template-columns: 1fr; }
+  .guide-layout { grid-template-columns: 1fr; }
+  .toc { display: none; }
+}
+
+@media (max-width: 600px) {
+  .hero-ctas { flex-direction: column; align-items: flex-start; }
+  .nav-actions .nav-link { display: none; }
+  .footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .file-meta { flex-wrap: wrap; gap: 12px; }
+  .toast-container { bottom: 16px; right: 16px; left: 16px; }
+  .toast { min-width: unset; max-width: unset; }
+}
+
+/* Focus visible styles */
+:focus-visible {
+  outline: 1px solid rgba(212,197,169,0.4);
+  outline-offset: 4px;
+  border-radius: 0;
+}
+
+/* ============================================================
+   SCROLL BLUR REVEAL
+   Content sharpens as it scrolls into view from below.
+   JS drives --blur-amount and opacity inline per frame.
+   ============================================================ */
+.blur-reveal {
+  will-change: filter, opacity, transform;
+}
+
+/* ============================================================
+   CURSOR TRAIL / SPOTLIGHT
+   ============================================================ */
+.cursor-spot {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9997;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,197,169,0.028) 0%, transparent 65%);
+  transform: translate(-50%, -50%);
+  transition: opacity 1.2s var(--ease-editorial);
+  will-change: transform;
+  mix-blend-mode: screen;
+}
+
+/* ============================================================
+   STAGGERED CHAR ANIMATION — Section headings
+   ============================================================ */
+.char-animate {
+  display: inline-block;
+  overflow: visible;
+}
+
+.char-animate .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.35em) rotate(0.4deg);
+  transition: opacity 0.7s var(--ease-editorial), transform 0.7s var(--ease-editorial);
+  will-change: transform, opacity;
+}
+
+.char-animate.visible .char {
+  opacity: 1;
+  transform: translateY(0) rotate(0deg);
+}
+
+/* ============================================================
+   MAGNETIC HOVER TRAIL — concept cards
+   ============================================================ */
+.concept-card {
+  --mx: 50%;
+  --my: 50%;
+}
+
+.concept-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx) var(--my), rgba(212,197,169,0.055) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-silk);
+  pointer-events: none;
+}
+
+.concept-card:hover::after {
+  opacity: 1;
+}
+
+/* ============================================================
+   LIQUID BORDER — pullquotes
+   ============================================================ */
+.pullquote {
+  position: relative;
+  transition: border-color 0.9s var(--ease-editorial);
+}
+
+.pullquote::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 1px;
+  height: 0%;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  transition: height 1.4s var(--ease-editorial);
+}
+
+.guide-section.visible .pullquote::before {
+  height: 100%;
+}
+
+/* ============================================================
+   WORD REVEAL — paragraphs on scroll
+   ============================================================ */
+.word-reveal {
+  overflow: hidden;
+}
+
+.word-reveal .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(110%);
+  transition: opacity 0.55s var(--ease-editorial), transform 0.55s var(--ease-editorial);
+  will-change: transform, opacity;
+}
+
+.word-reveal.visible .word {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   NAV LINK — refined underline wipe with elastic overshoot
+   ============================================================ */
+.nav-link {
+  --line-progress: 0;
+}
+
+/* ============================================================
+   SEARCH RESULT COUNT
+   ============================================================ */
+.search-result-count {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  white-space: nowrap;
+  padding: 0 4px;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-silk);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.search-result-count.visible {
+  opacity: 1;
+}
+
+/* Search jump buttons */
+.search-nav {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10,10,10,0.9);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 4px;
+}
+
+.search-nav.visible {
+  display: flex;
+}
+
+.search-nav-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 2px 5px;
+  font-size: 0.625rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  transition: color 0.3s;
+  line-height: 1;
+}
+
+.search-nav-btn:hover {
+  color: var(--accent);
+  border-color: rgba(212,197,169,0.2);
+}
+
+/* Active match highlight */
+mark.active-match {
+  background: rgba(212,197,169,0.28);
+  color: var(--text);
+  box-shadow: 0 0 0 1px rgba(212,197,169,0.2);
+}
+
+/* ============================================================
+   TABLE ROW REVEAL
+   ============================================================ */
+.compare-table tbody tr {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.5s var(--ease-editorial), transform 0.5s var(--ease-editorial);
+}
+
+.guide-section.visible .compare-table tbody tr:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.05s; }
+.guide-section.visible .compare-table tbody tr:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.12s; }
+.guide-section.visible .compare-table tbody tr:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.19s; }
+.guide-section.visible .compare-table tbody tr:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.26s; }
+.guide-section.visible .compare-table tbody tr:nth-child(5) { opacity: 1; transform: none; transition-delay: 0.33s; }
+
+/* ============================================================
+   LIST ITEM STAGGER
+   ============================================================ */
+.guide-section li {
+  opacity: 0;
+  transform: translateY(14px) scale(0.96);
+  transition:
+    opacity 0.55s var(--ease-editorial),
+    transform 0.65s var(--ease-bounce),
+    background 0.35s var(--ease-silk),
+    padding-left 0.6s var(--ease-bounce);
+}
+
+.guide-section li:hover {
+  background: rgba(212,197,169,0.018);
+  padding-left: 28px;
+}
+
+.guide-section.visible li:nth-child(1)  { opacity: 1; transform: none; transition-delay: 0.04s; }
+.guide-section.visible li:nth-child(2)  { opacity: 1; transform: none; transition-delay: 0.09s; }
+.guide-section.visible li:nth-child(3)  { opacity: 1; transform: none; transition-delay: 0.14s; }
+.guide-section.visible li:nth-child(4)  { opacity: 1; transform: none; transition-delay: 0.19s; }
+.guide-section.visible li:nth-child(5)  { opacity: 1; transform: none; transition-delay: 0.24s; }
+.guide-section.visible li:nth-child(6)  { opacity: 1; transform: none; transition-delay: 0.29s; }
+.guide-section.visible li:nth-child(7)  { opacity: 1; transform: none; transition-delay: 0.34s; }
+.guide-section.visible li:nth-child(8)  { opacity: 1; transform: none; transition-delay: 0.39s; }
+.guide-section.visible li:nth-child(9)  { opacity: 1; transform: none; transition-delay: 0.44s; }
+.guide-section.visible li:nth-child(10) { opacity: 1; transform: none; transition-delay: 0.49s; }
+.guide-section.visible li:nth-child(n+11) { opacity: 1; transform: none; transition-delay: 0.54s; }
+
+/* ============================================================
+   TOC — ink draw on active
+   ============================================================ */
+.toc-item a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: translateY(-50%);
+  transition: width 0.45s var(--ease-editorial);
+}
+
+.toc-item.active a::before,
+.toc-item a:hover::before {
+  width: 8px;
+}
+
+.toc-item a {
+  position: relative;
+}
+
+/* ============================================================
+   HERO EYEBROW — animated dash extend
+   ============================================================ */
+.hero-eyebrow::before {
+  width: 0;
+  transition: width 1.2s var(--ease-editorial) 2s;
+}
+
+.hero-eyebrow.line-extended::before {
+  width: 24px;
+}
+
+/* ============================================================
+   RESOURCES SECTION
+   ============================================================ */
+#resources {
+  padding: clamp(80px, 10vw, 140px) 0;
+  border-top: 1px solid var(--border);
+}
+
+.resources-header {
+  margin-bottom: clamp(48px, 6vw, 80px);
+}
+
+.resources-header h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.resources-header p {
+  font-size: 0.9375rem;
+  color: var(--text-2);
+  max-width: 460px;
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+/* ---- Video grid ---- */
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+  background: transparent;
+}
+
+.resource-video-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 40px 36px 36px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.6s var(--ease-silk), border-color 0.6s var(--ease-silk), transform 0.8s var(--ease-bounce), box-shadow 0.6s var(--ease-silk);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(24px) scale(0.97);
+  filter: blur(4px);
+}
+
+.resource-video-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212,197,169,0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-silk);
+}
+
+.resource-video-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0px);
+  transition-delay: 0s;
+}
+
+.resource-video-card:hover {
+  background: var(--surface-2);
+  border-color: rgba(212,197,169,0.12);
+  transform: translateY(-6px) scale(1.012);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  transition: background 0.4s var(--ease-silk), border-color 0.4s var(--ease-silk), transform 0.9s var(--ease-bounce), box-shadow 0.9s var(--ease-bounce);
+}
+
+.resource-video-card:hover::before { opacity: 1; }
+
+/* Thumbnail */
+.resource-video-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.6s var(--ease-silk);
+}
+
+.resource-video-card:hover .resource-video-thumb {
+  border-color: rgba(212,197,169,0.14);
+}
+
+.resource-video-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  transition: opacity 0.7s var(--ease-silk), transform 0.9s var(--ease-silk);
+  display: block;
+}
+
+.resource-video-card:hover .resource-video-thumb img {
+  opacity: 0.9;
+  transform: scale(1.024);
+}
+
+/* Play button — no transform jank, only opacity + border */
+.resource-play-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(6,6,6,0.65);
+  border: 1px solid rgba(212,197,169,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    background 0.6s var(--ease-silk),
+    border-color 0.6s var(--ease-silk);
+  z-index: 2;
+}
+
+.resource-play-btn svg { color: var(--accent); margin-left: 3px; }
+
+.resource-video-card:hover .resource-play-btn {
+  background: rgba(212,197,169,0.08);
+  border-color: rgba(212,197,169,0.5);
+}
+
+/* YouTube badge */
+.resource-video-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.4375rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  background: rgba(6,6,6,0.8);
+  padding: 4px 8px;
+  z-index: 2;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Card text */
+.resource-type-label {
+  font-family: var(--font-mono);
+  font-size: 0.4375rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(212,197,169,0.4);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.resource-type-label::before {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: rgba(212,197,169,0.22);
+  display: inline-block;
+}
+
+.resource-video-card h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.1rem, 1.6vw, 1.375rem);
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.resource-video-card p {
+  font-size: 0.875rem;
+  color: var(--text-2);
+  line-height: 1.78;
+  font-weight: 300;
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.resource-link-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: auto;
+  transition: color 0.5s var(--ease-silk);
+}
+
+.resource-video-card:hover .resource-link-label { color: var(--accent); }
+
+.resource-link-label svg { transition: transform 0.6s var(--ease-editorial); }
+.resource-video-card:hover .resource-link-label svg { transform: translateX(6px); }
+
+/* Play inline label */
+.resource-play-label {
+  cursor: pointer;
+}
+
+/* YouTube external link badge */
+.resource-yt-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  text-decoration: none;
+  margin-top: 8px;
+  transition: color 0.4s var(--ease-silk);
+  width: fit-content;
+  pointer-events: auto;
+}
+
+.resource-yt-link:hover { color: var(--accent); }
+
+/* Iframe embed container */
+.resource-video-embed {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  margin-bottom: 28px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #000;
+}
+
+.resource-video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Playing state — hide thumb, show embed */
+.resource-video-card.playing .resource-video-thumb {
+  display: none;
+}
+
+.resource-video-card:not(.playing) .resource-video-embed {
+  display: none;
+}
+
+/* cursor for clickable card */
+.resource-video-card[data-video-id] {
+  cursor: pointer;
+}
+
+/* ---- Website cards ---- */
+.resources-sites {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background: transparent;
+}
+
+.resource-site-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 32px 36px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  transition: background 0.6s var(--ease-silk), border-color 0.6s var(--ease-silk), transform 0.8s var(--ease-bounce), box-shadow 0.6s var(--ease-silk);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  filter: blur(3px);
+}
+
+/* Left accent bar */
+.resource-site-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(212,197,169,0.35), transparent);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-silk), top 0.6s var(--ease-silk), bottom 0.6s var(--ease-silk);
+}
+
+.resource-site-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0px);
+  transition-delay: 0s;
+}
+
+.resource-site-card:hover {
+  background: var(--surface-2);
+  border-color: rgba(212,197,169,0.1);
+  transform: translateY(-4px) scale(1.008);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+  transition: background 0.4s var(--ease-silk), border-color 0.4s var(--ease-silk), transform 0.85s var(--ease-bounce), box-shadow 0.85s var(--ease-bounce);
+}
+
+.resource-site-card:hover::before { opacity: 1; top: 0; bottom: 0; }
+
+.resource-site-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.resource-site-label {
+  font-family: var(--font-mono);
+  font-size: 0.4375rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(212,197,169,0.38);
+}
+
+.resource-site-card h3 {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: -0.008em;
+  line-height: 1.3;
+}
+
+.resource-site-card p {
+  font-size: 0.8125rem;
+  color: var(--text-2);
+  font-weight: 300;
+  line-height: 1.65;
+}
+
+.resource-site-arrow {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-3);
+  transition:
+    border-color 0.6s var(--ease-silk),
+    color 0.6s var(--ease-silk),
+    transform 0.7s var(--ease-editorial);
+}
+
+.resource-site-card:hover .resource-site-arrow {
+  border-color: rgba(212,197,169,0.25);
+  color: var(--accent);
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 900px) {
+  .resources-grid { grid-template-columns: 1fr; }
+  .resources-sites { grid-template-columns: 1fr; }
+}
+/* ============================================================
+   HAMBURGER MENU
+   ============================================================ */
+.hamburger-btn {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0;
+  transition: border-color 0.4s var(--ease-silk), background 0.4s var(--ease-silk);
+  position: relative;
+  flex-shrink: 0;
+  will-change: transform;
+}
+
+.hamburger-btn:hover {
+  border-color: rgba(212,197,169,0.25);
+  background: rgba(212,197,169,0.04);
+}
+
+.hamburger-btn .bar {
+  display: block;
+  width: 14px;
+  height: 1px;
+  background: var(--text-3);
+  transition:
+    transform 0.55s var(--ease-out),
+    opacity 0.35s var(--ease-silk),
+    width 0.4s var(--ease-editorial),
+    background 0.4s var(--ease-silk);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.hamburger-btn:hover .bar { background: var(--text-2); }
+
+/* Animate bars to × when open */
+.hamburger-btn.open .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); background: var(--accent); }
+.hamburger-btn.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.open .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); background: var(--accent); }
+
+/* Menu panel */
+.hamburger-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100vh;
+  background: rgba(7,7,7,0.98);
+  border-left: 1px solid var(--border);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Closed state — use translate3d for GPU compositing */
+  transform: translate3d(100%, 0, 0);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.55s var(--ease-out),
+    opacity 0.45s var(--ease-silk),
+    visibility 0s linear 0.55s;
+  will-change: transform, opacity;
+  backdrop-filter: blur(28px) saturate(1.3);
+  -webkit-backdrop-filter: blur(28px) saturate(1.3);
+}
+
+.hamburger-menu::-webkit-scrollbar { display: none; }
+
+.hamburger-menu.open {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    transform 0.55s var(--ease-out),
+    opacity 0.45s var(--ease-silk),
+    visibility 0s linear 0s;
+}
+
+/* Backdrop */
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background 0.55s var(--ease-silk);
+  will-change: background;
+}
+
+.menu-backdrop.open {
+  background: rgba(0,0,0,0.55);
+  pointer-events: auto;
+}
+
+/* ---- Menu header ---- */
+.menu-header {
+  padding: 24px 32px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.menu-wordmark {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.4s var(--ease-editorial), transform 0.5s var(--ease-out);
+}
+
+.hamburger-menu.open .menu-wordmark {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.06s;
+}
+
+.menu-close-btn {
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  transition: border-color 0.35s var(--ease-silk), color 0.35s var(--ease-silk), background 0.35s var(--ease-silk);
+  opacity: 0;
+  transform: translateX(8px);
+  transition-delay: 0s;
+  flex-shrink: 0;
+}
+
+.hamburger-menu.open .menu-close-btn {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.4s var(--ease-editorial), transform 0.5s var(--ease-out), border-color 0.35s var(--ease-silk), color 0.35s var(--ease-silk), background 0.35s var(--ease-silk);
+  transition-delay: 0.08s;
+}
+
+.menu-close-btn:hover {
+  border-color: rgba(212,197,169,0.2);
+  color: var(--accent);
+  background: rgba(212,197,169,0.04);
+}
+
+/* ---- Menu body ---- */
+.menu-body {
+  padding: 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.menu-body::-webkit-scrollbar { display: none; }
+
+/* Menu sections */
+.menu-section {
+  margin-bottom: 32px;
+}
+
+.menu-section:last-child { margin-bottom: 0; }
+
+.menu-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.4375rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition:
+    opacity 0.4s var(--ease-editorial),
+    transform 0.5s var(--ease-out);
+}
+
+.menu-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent);
+}
+
+.hamburger-menu.open .menu-section:nth-child(1) .menu-section-label {
+  opacity: 1; transform: translateX(0); transition-delay: 0.1s;
+}
+.hamburger-menu.open .menu-section:nth-child(2) .menu-section-label {
+  opacity: 1; transform: translateX(0); transition-delay: 0.22s;
+}
+.hamburger-menu.open .menu-section:nth-child(3) .menu-section-label {
+  opacity: 1; transform: translateX(0); transition-delay: 0.34s;
+}
+
+.menu-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 300;
+  color: var(--text-2);
+  text-decoration: none;
+  padding: 9px 0 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  letter-spacing: 0.01em;
+  position: relative;
+  opacity: 0;
+  transform: translate3d(14px, 0, 0);
+  transition:
+    color 0.35s var(--ease-silk),
+    padding-left 0.45s var(--ease-out),
+    opacity 0.4s var(--ease-editorial),
+    transform 0.45s var(--ease-out);
+  will-change: transform, opacity;
+}
+
+/* Hairline separator — barely-there, only between items */
+.menu-link + .menu-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent 80%);
+  pointer-events: none;
+}
+
+.menu-link:first-child { border-top: none; }
+
+.menu-link-arrow {
+  width: 18px;
+  height: 18px;
+  color: var(--text-3);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.3s var(--ease-silk), transform 0.4s var(--ease-spring), color 0.3s var(--ease-silk);
+  flex-shrink: 0;
+}
+
+.menu-link:hover {
+  color: var(--text);
+  padding-left: 8px;
+}
+
+.menu-link:hover .menu-link-arrow {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--accent);
+}
+
+/* Stagger: scoped per section using li:nth-child inside each section */
+.hamburger-menu.open .menu-section:nth-child(1) .menu-link:nth-child(1) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.13s; }
+.hamburger-menu.open .menu-section:nth-child(1) .menu-link:nth-child(2) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.17s; }
+.hamburger-menu.open .menu-section:nth-child(1) .menu-link:nth-child(3) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.21s; }
+.hamburger-menu.open .menu-section:nth-child(1) .menu-link:nth-child(4) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.25s; }
+.hamburger-menu.open .menu-section:nth-child(1) .menu-link:nth-child(5) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.29s; }
+
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(1)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.26s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(2)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.30s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(3)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.34s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(4)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.38s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(5)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.42s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(6)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.46s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(7)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.50s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(8)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.54s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(9)  { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.58s; }
+.hamburger-menu.open .menu-section:nth-child(2) .menu-link:nth-child(10) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.62s; }
+
+.hamburger-menu.open .menu-section:nth-child(3) .menu-link:nth-child(1) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.38s; }
+.hamburger-menu.open .menu-section:nth-child(3) .menu-link:nth-child(2) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.42s; }
+.hamburger-menu.open .menu-section:nth-child(3) .menu-link:nth-child(3) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.46s; }
+.hamburger-menu.open .menu-section:nth-child(3) .menu-link:nth-child(4) { opacity: 1; transform: translate3d(0,0,0); transition-delay: 0.50s; }
+
+/* Closing — wipe delays so everything fades out clean and fast */
+.hamburger-menu:not(.open) .menu-link,
+.hamburger-menu:not(.open) .menu-section-label,
+.hamburger-menu:not(.open) .menu-wordmark,
+.hamburger-menu:not(.open) .menu-close-btn {
+  transition-delay: 0s !important;
+}
+
+/* Divider between menu sections */
+.menu-divider {
+  display: none;
+}
+
+/* ---- Menu footer ---- */
+.menu-footer {
+  padding: 20px 32px 28px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.menu-footer-text {
+  font-size: 0.5625rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-editorial);
+}
+
+.hamburger-menu.open .menu-footer-text {
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+</style>
+</head>
+<body>
+
+<!-- CURSOR SPOTLIGHT -->
+<div class="cursor-spot" id="cursorSpot" aria-hidden="true"></div>
+
+<!-- LOADER -->
+<div id="loader" role="status" aria-live="polite">
+  <div class="loader-wordmark" aria-label="Lucid">
+    <span style="animation-delay:0.08s">L</span>
+    <span style="animation-delay:0.22s">u</span>
+    <span style="animation-delay:0.36s">c</span>
+    <span style="animation-delay:0.50s">i</span>
+    <span style="animation-delay:0.64s">d</span>
+  </div>
+  <div class="loader-line"></div>
+  <div class="loader-sub">VibeCode CSS</div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar" id="progress" role="progressbar" aria-label="Reading progress"></div>
+
+<!-- AMBIENT BG -->
+<div class="bg-glow" aria-hidden="true">
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" aria-live="polite" aria-atomic="true" id="toastContainer"></div>
+
+<!-- NAV -->
+<nav id="nav" role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav-brand" aria-label="Lucid — Home">Lucid</a>
+  <div class="nav-actions">
+    <a href="#what" class="nav-link">About</a>
+    <a href="#guide" class="nav-link">Guide</a>
+    <a href="#resources" class="nav-link">Resources</a>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="hamburgerMenu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MENU BACKDROP -->
+<div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
+
+<!-- HAMBURGER MENU -->
+<nav class="hamburger-menu" id="hamburgerMenu" aria-label="Site navigation menu" aria-hidden="true">
+
+  <div class="menu-header">
+    <span class="menu-wordmark">Lucid</span>
+    <button class="menu-close-btn" id="menuCloseBtn" aria-label="Close navigation menu">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="menu-body">
+
+    <div class="menu-section">
+      <span class="menu-section-label">Pages</span>
+      <ul class="menu-links">
+        <li><a href="#hero" class="menu-link">Home <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#what" class="menu-link">What is VibeCode <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#guide" class="menu-link">Guide <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#download" class="menu-link">Download <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#resources" class="menu-link">Resources <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section">
+      <span class="menu-section-label">Guide Sections</span>
+      <ul class="menu-links">
+        <li><a href="#s-intro" class="menu-link">Introduction <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step1" class="menu-link">Step 1 — Decide <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step2" class="menu-link">Step 2 — Context <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step3" class="menu-link">Step 3 — Permissions <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step4" class="menu-link">Step 4 — Output Format <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step5" class="menu-link">Step 5 — Precision <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step6" class="menu-link">Step 6 — Iterate <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step7" class="menu-link">Step 7 — Consulting <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step8" class="menu-link">Step 8 — Choosing AI <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-step9" class="menu-link">Step 9 — The Cycle <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+      </ul>
+    </div>
+
+    <div class="menu-section">
+      <span class="menu-section-label">Reference</span>
+      <ul class="menu-links">
+        <li><a href="#s-styles" class="menu-link">Style Archetypes <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-trouble" class="menu-link">Troubleshooting <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-quickref" class="menu-link">Quick Reference <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a href="#s-checklist" class="menu-link">Checklist <svg class="menu-link-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 10L10 2M10 2H4M10 2v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="menu-footer">
+    <span class="menu-footer-text">VibeCode CSS — Lucid</span>
+  </div>
+
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section id="hero" aria-labelledby="hero-heading">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-eyebrow" aria-label="Section: A Lucid Product">A Lucid Product</div>
+        <h1 class="hero-headline" id="hero-heading">
+          <span class="hero-headline-line"><span>Style anything.</span></span>
+          <span class="hero-headline-line"><span>Direct <em>everything.</em></span></span>
+          <span class="hero-headline-line"><span>Code nothing.</span></span>
+        </h1>
+        <p class="hero-body">
+          VibeCode CSS is a complete reference system for customizing JanitorAI profile pages using AI — no coding experience required. One skill file. Infinite creative directions.
+        </p>
+        <div class="hero-ctas">
+          <a href="https://drive.google.com/file/d/1prDsBgFmka02vmeM6dh0hoOflOEZK-iG/view?usp=drivesdk" class="btn-primary" target="_blank" rel="noopener" id="heroDownloadBtn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M8 1v9M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Download skill.md
+          </a>
+          <a href="#guide" class="btn-secondary">
+            Read the guide
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="hero-scroll-line"></div>
+      <span class="hero-scroll-label">Scroll</span>
+    </div>
+  </section>
+
+  <!-- WHAT IS VIBECODE -->
+  <section id="what" aria-labelledby="what-heading">
+    <div class="container">
+      <div class="what-grid">
+        <div class="what-left reveal">
+          <div class="mark-divider" aria-hidden="true">
+            <span class="mark-label">What is VibeCode</span>
+          </div>
+          <h2 id="what-heading">You are the director.<br><em>AI is your developer.</em></h2>
+          <p>VibeCoding is the art of working with an AI to produce code you could never write yourself. You don't need to know CSS. You need to know what you want — and how to say it precisely.</p>
+          <p>VibeCode CSS gives you the structural foundation: a complete map of JanitorAI's class naming system, stable selectors, component inventory, and specificity strategies — so the AI never has to guess.</p>
+          <p>The gap between a mediocre result and something stunning is almost entirely in how clearly the creative direction was communicated.</p>
+        </div>
+        <div class="what-right reveal reveal-delay-1">
+          <article class="concept-card">
+            <span class="concept-num">01</span>
+            <h3>The skill.md file</h3>
+            <p>A complete reverse-engineering of JanitorAI's CSS architecture. Every stable selector, every CSS variable, every component — documented and ready to hand to your AI.</p>
+          </article>
+          <article class="concept-card">
+            <span class="concept-num">02</span>
+            <h3>The VibeCode Guide</h3>
+            <p>A step-by-step workflow for turning your creative vision into real CSS. Covers context-setting, prompt structure, iteration cycles, and troubleshooting.</p>
+          </article>
+          <article class="concept-card">
+            <span class="concept-num">03</span>
+            <h3>The result</h3>
+            <p>A profile page that looks like it was designed by someone who obsessed over every pixel — built in a conversation with an AI, without writing a single line of CSS yourself.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDE READER -->
+  <section id="guide" aria-labelledby="guide-heading">
+    <div class="container">
+      <div class="guide-header reveal">
+        <div class="mark-divider" aria-hidden="true">
+          <span class="mark-label">Complete Guide</span>
+        </div>
+        <h2 id="guide-heading">VibeCode Guide</h2>
+        <p>Everything you need to build beautiful JanitorAI profile themes using AI. Read it here, or download the skill.md to use directly.</p>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrap reveal">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search the guide…" aria-label="Search guide content">
+        <div class="search-nav" id="searchNav">
+          <button class="search-nav-btn" id="searchPrev" aria-label="Previous match">↑</button>
+          <span class="search-result-count visible" id="searchCount"></span>
+          <button class="search-nav-btn" id="searchNext" aria-label="Next match">↓</button>
+        </div>
+        <button class="search-clear" id="searchClear" aria-label="Clear search">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="guide-layout">
+
+        <!-- TOC -->
+        <nav class="toc" aria-label="Table of contents">
+          <div class="toc-title">Contents</div>
+          <ul class="toc-list" id="tocList" role="list">
+            <li class="toc-item" data-target="s-intro"><a href="#s-intro">Introduction</a></li>
+            <li class="toc-item" data-target="s-step1"><a href="#s-step1">Step 1 — Decide</a></li>
+            <li class="toc-item" data-target="s-step2"><a href="#s-step2">Step 2 — Context</a></li>
+            <li class="toc-item" data-target="s-step3"><a href="#s-step3">Step 3 — Permissions</a></li>
+            <li class="toc-item" data-target="s-step4"><a href="#s-step4">Step 4 — Output Format</a></li>
+            <li class="toc-item" data-target="s-step5"><a href="#s-step5">Step 5 — Precision</a></li>
+            <li class="toc-item" data-target="s-step6"><a href="#s-step6">Step 6 — Iterate</a></li>
+            <li class="toc-item" data-target="s-step7"><a href="#s-step7">Step 7 — Prompt Consulting</a></li>
+            <li class="toc-item" data-target="s-step8"><a href="#s-step8">Step 8 — Choosing AI</a></li>
+            <li class="toc-item" data-target="s-step9"><a href="#s-step9">Step 9 — The Cycle</a></li>
+            <li class="toc-item" data-target="s-styles"><a href="#s-styles">Style Archetypes</a></li>
+            <li class="toc-item" data-target="s-trouble"><a href="#s-trouble">Troubleshooting</a></li>
+            <li class="toc-item" data-target="s-quickref"><a href="#s-quickref">Quick Reference</a></li>
+            <li class="toc-item" data-target="s-checklist"><a href="#s-checklist">Checklist</a></li>
+          </ul>
+        </nav>
+
+        <!-- GUIDE CONTENT -->
+        <div class="guide-content" id="guideContent">
+
+          <article class="guide-section" id="s-intro">
+            <h2>Introduction — What Even Is VibeCoding?</h2>
+            <div class="pullquote">
+              <p>VibeCoding is the art of working with an AI to produce code you could never write yourself. You're not learning to code. You're learning to direct.</p>
+            </div>
+            <p>Think of yourself as a creative director and the AI as your developer. Your job is to have clear ideas and communicate them well. The AI's job is to translate those ideas into actual CSS.</p>
+            <p>Bad creative directors give vague instructions and wonder why the result is wrong. Good creative directors give specific direction, review the output critically, and iterate until it's right. That's the entire skill.</p>
+            <div class="callout">
+              <span class="callout-label">Important mindset</span>
+              <p>The first output the AI gives you is almost never the final result. That's not failure — that's the process. Expect five to fifteen rounds of iteration on anything ambitious. Every round gets you closer.</p>
+            </div>
+            <p>The designers you see with stunning profiles didn't get it right on prompt one either.</p>
+          </article>
+
+          <article class="guide-section" id="s-step1">
+            <h2>Step 1 — Decide What You Want Before You Open The AI</h2>
+            <p>This is the step most people skip and it's why they get mediocre results. If you open the AI and say "make my profile look cool," you're going to get something generic. The AI has no taste without direction. Your taste becomes its taste, only if you communicate it clearly.</p>
+
+            <h3>Where to Get Inspiration</h3>
+            <ul>
+              <li><strong>Pinterest</strong> — Search for "dark UI design," "profile page aesthetic," "glassmorphism card," "cyberpunk interface." Save screenshots of whatever feels right.</li>
+              <li><strong>Dribbble and Behance</strong> — Professional design portfolios. Search "user profile UI," "character card design," "dark theme app." Very high quality.</li>
+              <li><strong>Games</strong> — Video game UIs are a goldmine. Menu screens, character select, loading UIs. Screenshot them.</li>
+              <li><strong>Anime</strong> — Opening sequences, title cards, character profile screens. Some of the most distinctive visual styles come from anime aesthetics.</li>
+              <li><strong>Movies</strong> — Sci-fi interfaces (Blade Runner, The Matrix, Westworld), fantasy aesthetics, horror minimalism.</li>
+              <li><strong>Canva</strong> — Great for rough mood board assembly. Drop your screenshots in, pick color swatches, try font combinations.</li>
+              <li><strong>Handwritten sketches</strong> — A phone photo of a rough box diagram you drew on paper is a completely valid reference.</li>
+            </ul>
+
+            <h3>Build Two Separate Plans</h3>
+            <p>Mobile and desktop are completely different experiences and should be designed separately. Your mobile layout is viewed on a small vertical screen — things need to be stacked, text readable at small sizes. Your desktop layout has wide horizontal space — side-by-side columns, richer hover interactions.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Example layout brief</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>MOBILE:
+- Full-width hero banner with avatar overlapping bottom edge
+- Username and stats below the avatar, centered
+- Bio text centered, short
+- Character cards stack as single column
+- Clean, minimal, text is big and readable
+
+DESKTOP:
+- Two-column layout: left sidebar has avatar + profile info
+- Character cards in 3-column grid on the right
+- Sidebar stays fixed while content scrolls
+- More visual decoration visible, subtle background texture</code></pre>
+            </div>
+          </article>
+
+          <article class="guide-section" id="s-step2">
+            <h2>Step 2 — Give The AI The Right Context</h2>
+            <p>This is the single biggest difference between getting good results and getting garbage. An AI cannot produce a good CSS override if it doesn't understand the structure of what it's overriding.</p>
+            <p>Every session with the AI should start by providing three things:</p>
+            <ol>
+              <li>The HTML file of the page</li>
+              <li>The skill.md file</li>
+              <li>Any CSS you've already generated in previous sessions</li>
+            </ol>
+            <p>And then explicitly tell the AI to read all of them before doing anything. An AI that hasn't read the HTML will hallucinate class names, invent selectors that don't exist, and produce CSS that does nothing or breaks things.</p>
+
+            <h3>Opening Instruction Template</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Prompt template</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>I'm going to provide you with three things. Please read all of them
+carefully before writing any code.
+
+1. The HTML source of a JanitorAI profile page (attached)
+2. A skill.md file that reverse-engineers the page's CSS architecture,
+   stable selectors, and component structure (attached)
+3. My current CSS override file (if applicable — pasted below)
+
+Do NOT begin writing CSS until you have confirmed you've studied the HTML
+structure, identified the stable pp-* and profile-* selectors from skill.md,
+and understood the existing override if one exists.
+
+Confirm when you're ready.</code></pre>
+            </div>
+
+            <div class="callout">
+              <span class="callout-label">Key rule</span>
+              <p>The confirmation step forces the AI to actually process everything. If the AI starts generating code immediately without confirming — stop it and ask again.</p>
+            </div>
+          </article>
+
+          <article class="guide-section" id="s-step3">
+            <h2>Step 3 — Tell The AI What It's Allowed To Do</h2>
+            <p>AIs are often cautious by default. They'll make minimal changes if they think you want minimal changes. You need to explicitly give permission for bolder work.</p>
+            <p>Include a permissions block in your prompt:</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Permissions block</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>PERMISSIONS:
+- You may create new wrapper divs or decorative container elements if needed
+- You may add purely decorative elements (::before, ::after pseudo-elements,
+  gradient overlays, background patterns)
+- You may reorganize visual layout using Flexbox or Grid while keeping
+  existing HTML elements functional
+- You may replace the existing visual layout completely while preserving
+  all interactive functionality
+- You may introduce new CSS custom properties (variables) for consistency
+- You may redesign individual sections completely
+- You may add smooth transitions and hover animations
+- You may use advanced CSS techniques (backdrop-filter, clip-path, gradients)
+
+RESTRICTIONS:
+- Do NOT change any class names in the HTML
+- Do NOT remove interactive elements (buttons, links, inputs)
+- Do NOT break the existing navigation functionality
+- Do NOT use JavaScript
+- Always use pp-* and profile-* selectors as primary targets
+- Avoid targeting hashed css-XXXXXXXX classes as primary selectors</code></pre>
+            </div>
+          </article>
+
+          <article class="guide-section" id="s-step4">
+            <h2>Step 4 — Always Specify Your Output Format</h2>
+            <p>If you don't tell the AI how to structure its response, you'll get some mix of explanation and code that's a mess to work with. Always include an output format instruction:</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Output format template</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>OUTPUT FORMAT:
+Please respond with exactly three sections:
+
+[HTML ADDITIONS]
+Any new HTML elements. If none needed, write: No HTML changes.
+
+[CSS]
+A single complete code block with the FULL CSS override file.
+Always the complete current state — not just the changes.
+
+[CHANGES SUMMARY]
+A brief bullet-point list of what changed and why.</code></pre>
+            </div>
+
+            <p>Request the full CSS every time instead of just the changes — so you can copy-paste the whole thing and replace what you had. Much faster, much less error-prone.</p>
+          </article>
+
+          <article class="guide-section" id="s-step5">
+            <h2>Step 5 — Ask Better Questions (Describe Outcomes, Not Feelings)</h2>
+            <p>This is where most people get stuck. The solution is to describe outcomes, not feelings.</p>
+
+            <table class="compare-table" aria-label="Vague vs specific prompts">
+              <thead>
+                <tr>
+                  <th>Instead of…</th>
+                  <th>Say this</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>"make it prettier"</td>
+                  <td>Increase visual hierarchy between the username and the follower count — make the username 1.5× larger and reduce the follower count to muted text</td>
+                </tr>
+                <tr>
+                  <td>"make it more professional"</td>
+                  <td>Replace with a two-column desktop layout where profile info is a fixed left sidebar (280px) and character cards fill the right</td>
+                </tr>
+                <tr>
+                  <td>"I don't like the cards"</td>
+                  <td>The cards feel too flat — add a subtle drop shadow and increase border-radius to 16px to make them feel more elevated</td>
+                </tr>
+                <tr>
+                  <td>"make the colors better"</td>
+                  <td>Switch to deep navy and gold: background #0a0e1a, accent #c9a84c, white text at 90% opacity</td>
+                </tr>
+                <tr>
+                  <td>"add some animations"</td>
+                  <td>Add a subtle fade-in-upward entrance on page load, and scale 1.02 on character card hover with 300ms ease-out transition</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="guide-section" id="s-step6">
+            <h2>Step 6 — Learn To Iterate</h2>
+            <div class="pullquote">
+              <p>The first draft is not the final draft. After the AI gives you output, don't accept or reject it wholesale. Review it section by section.</p>
+            </div>
+            <h3>What to look for</h3>
+            <ul>
+              <li><strong>Spacing</strong> — Does everything feel too cramped? Too spread out? Breathing room matters.</li>
+              <li><strong>Proportions</strong> — Is the avatar too large? Is the sidebar too narrow? Do the cards feel imbalanced?</li>
+              <li><strong>Hierarchy</strong> — When you look at the page, is it obvious what's most important? Does your eye know where to go first?</li>
+              <li><strong>Typography</strong> — Is text legible? Does size difference feel intentional? Does the font fit the aesthetic?</li>
+              <li><strong>Color</strong> — Is there enough contrast? Does the palette feel cohesive? Are accent colors used consistently?</li>
+              <li><strong>Animations</strong> — Do they feel smooth? Too fast? Too slow? Do they start in the wrong place?</li>
+              <li><strong>Responsiveness</strong> — Does it look good at mobile width? Are there weird breakpoints where things fall apart?</li>
+            </ul>
+
+            <h3>Good iteration feedback examples</h3>
+            <div class="callout">
+              <span class="callout-label">Example feedback</span>
+              <p>"The card hover animation is too fast. The scale increase also feels too large at 1.05. Reduce the scale to 1.02 and slow the transition to 400ms."</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Example feedback</span>
+              <p>"The username heading doesn't feel prominent enough against the background. Increase its font size and add a subtle text shadow to give it more presence."</p>
+            </div>
+            <p>Never say: "It looks bad." "I don't like it." "Make it better." These tell the AI nothing.</p>
+          </article>
+
+          <article class="guide-section" id="s-step7">
+            <h2>Step 7 — Use Another AI To Improve Your Prompts</h2>
+            <p>This sounds unusual but it works incredibly well. Open a second AI conversation — can be the same model or different. This AI is just a prompt consultant. Don't paste your HTML or CSS there.</p>
+
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Prompt consultant template</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>I'm trying to write a prompt for an AI developer to style a profile page.
+Here is my current prompt draft. Please review it for:
+- Ambiguity (anything that could be misinterpreted)
+- Missing information (what would a developer need to know)
+- Vague adjectives (replace with specific measurable descriptions)
+- Missing references or constraints
+
+Then rewrite the prompt to be cleaner and more precise.
+
+[paste your prompt here]</code></pre>
+            </div>
+
+            <p>The rewritten version will often be noticeably better. You'll start to internalize this process and your first drafts will get better over time.</p>
+          </article>
+
+          <article class="guide-section" id="s-step8">
+            <h2>Step 8 — Choosing The Right AI Model</h2>
+            <h3>Context window matters</h3>
+            <p>The HTML file for a JanitorAI profile page is large. It contains thousands of lines of HTML and embedded CSS. You're also providing skill.md. Together these are a significant amount of text.</p>
+            <p>Lightweight or fast models sometimes truncate what they read. They skip sections of the HTML and then produce CSS that doesn't match the actual page structure. This leads to selectors that don't work.</p>
+            <p>Use a model with a large context window and strong instruction-following.</p>
+
+            <h3>Free — no subscription needed</h3>
+            <p>Frontier-class models you can use right now without paying for anything. Good enough for most sessions.</p>
+            <ul>
+              <li><strong>Gemini 3.1 Pro</strong> — Google's current flagship. 1M token context window, extremely strong at following complex instructions, top-tier CSS output. Free access is available via Google AI Studio with some rate limits — the best free option by a wide margin.</li>
+              <li><strong>GPT-5.5 Instant</strong> — OpenAI's default ChatGPT model, free for everyone. A significant step up from older models. Handles long context and structured prompts well. If you're already using ChatGPT, this is what you're on.</li>
+            </ul>
+
+            <h3>Paid — higher limits, best results</h3>
+            <p>For serious theming work or when you keep hitting rate limits. Each of these requires a subscription to unlock full access.</p>
+            <ul>
+              <li><strong>Claude Opus 4.8 / Sonnet 4.6</strong> (Anthropic Pro) — Both are excellent for this kind of work. Opus 4.8 is the stronger reasoning model; Sonnet 4.6 is faster and still very capable. The best at following nuanced creative direction and staying consistent through long sessions without losing context.</li>
+              <li><strong>GPT-5.5 Pro</strong> (ChatGPT Pro) — OpenAI's top-tier model, unlocked with a Pro subscription. Stronger than GPT-5.5 Instant on complex agentic tasks and multi-step instruction chains. Worth it if you're already a ChatGPT Pro user.</li>
+            </ul>
+
+            <div class="callout">
+              <span class="callout-label">Recommendation</span>
+              <p>Start with Gemini 3.1 Pro (free via AI Studio) — it handles the large context without truncation and produces clean CSS output. If you want better creative direction quality or hit rate limits, Claude Opus 4.8 with a Pro subscription is the step up.</p>
+            </div>
+
+            <h3>What to watch for</h3>
+            <ul>
+              <li>If an AI generates selectors you don't recognize from skill.md, it may be hallucinating class names. Compare against the stable selectors listed in skill.md.</li>
+              <li>If an AI produces extremely short responses when you've provided a lot of context, it may be truncating. Try a different model.</li>
+              <li>If an AI keeps losing track of your instructions between messages, restate your full context at the start of each new message.</li>
+            </ul>
+          </article>
+
+          <article class="guide-section" id="s-step9">
+            <h2>Step 9 — The Continuous Improvement Cycle</h2>
+            <p>Good vibecoding is a loop:</p>
+            <ol>
+              <li><strong>Study</strong> — Review your inspiration. Know what you're aiming for.</li>
+              <li><strong>Improve Prompt</strong> — Write a clear, specific prompt. Use a second AI to refine it if needed.</li>
+              <li><strong>Generate</strong> — Provide context (HTML, skill.md, existing CSS) and submit.</li>
+              <li><strong>Review</strong> — Look at the output critically. Break it down by section.</li>
+              <li><strong>Critique</strong> — Write specific, measurable feedback.</li>
+              <li><strong>Repeat</strong> — Feed the feedback back as the next prompt.</li>
+            </ol>
+            <p>After five projects you'll find your first prompts are already closer to what you want. After ten you'll be producing results in two or three rounds that used to take fifteen.</p>
+          </article>
+
+          <article class="guide-section" id="s-styles">
+            <h2>Style Archetypes</h2>
+            <p>Use these as starting aesthetic briefs to hand to your AI. Describe outcomes, not just labels.</p>
+
+            <h3>Dark Luxury / Editorial</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Aesthetic brief</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>Near-black background (#0a0a0a). Deep charcoal surfaces (#111111).
+Single warm platinum accent (#d4c5a9). Serif headings (Playfair Display
+or Cormorant Garamond). Sans-serif body (Inter or Geist).
+Thin 1px borders at low opacity. No shadows, no glows.
+Everything communicates restraint and cost.
+Wide letter-spacing on labels. Generous whitespace.
+Character cards: tall portrait format, minimal text overlay.</code></pre>
+            </div>
+
+            <h3>Neon Noir / Cyberpunk</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Aesthetic brief</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>Very dark blue-black background (#03040a). Electric cyan (#00e5ff) or
+hot pink (#ff2d78) accent. Monospaced or tech sans-serif font (IBM Plex Mono,
+Space Mono). Bright glowing borders (box-shadow: 0 0 8px var(--accent)).
+Scanline texture (repeating-linear-gradient). Uppercase labels.
+Grid overlay at very low opacity. Animated blinking or pulse effects.</code></pre>
+            </div>
+
+            <h3>Baroque Luxury</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Aesthetic brief</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>Deep jewel tones: sapphire, emerald, ruby on near-black.
+Gold accents (#c9a84c, #e8d5a3). Ornamental dividers using Unicode
+characters or CSS borders. Heavy use of box-shadow for depth.
+Serif typefaces with italic emphasis. Everything feels weighty and important.
+Character cards with thick ornate borders and warm background tint.</code></pre>
+            </div>
+          </article>
+
+          <article class="guide-section" id="s-trouble">
+            <h2>Troubleshooting</h2>
+
+            <h3>The CSS does nothing</h3>
+            <p>Most common cause: the AI used the wrong selectors. Chakra UI's hashed <code>css-XXXXXXX</code> classes change with every deployment. If the AI targeted those instead of the <code>pp-*</code> and <code>profile-*</code> classes, the CSS won't apply.</p>
+            <div class="callout">
+              <span class="callout-label">Fix</span>
+              <p>"Your selectors don't seem to be working. Please cross-reference the skill.md selector table and confirm you're using the stable pp-* and profile-* classes. Rewrite the CSS using only those selectors."</p>
+            </div>
+
+            <h3>The AI keeps forgetting earlier instructions</h3>
+            <p>This happens in long sessions. The AI's attention gets spread thin.</p>
+            <div class="callout">
+              <span class="callout-label">Fix</span>
+              <p>Start a new chat and reattach all materials. Sometimes a fresh start is faster than trying to fix a confused session.</p>
+            </div>
+
+            <h3>Something breaks when you apply the CSS</h3>
+            <div class="callout">
+              <span class="callout-label">Fix</span>
+              <p>"When I applied the CSS, [X component] broke. Please review the current CSS and remove or correct any rules that affect [X element] beyond its visual appearance."</p>
+            </div>
+
+            <h3>The design looks wrong on mobile</h3>
+            <div class="callout">
+              <span class="callout-label">Fix</span>
+              <p>"The desktop layout looks correct. However the mobile layout has these specific issues: [list them]. Please add mobile-specific media query rules to fix these. Desktop styles should remain unchanged."</p>
+            </div>
+          </article>
+
+          <article class="guide-section" id="s-quickref">
+            <h2>Quick Reference — Common Tweaks</h2>
+
+            <h3>Color change</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Prompt</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>Change the accent color from [current] to [new]. Update every place the
+current accent appears — borders, hover states, the tab indicator, the
+follow button, and any text using the accent color.</code></pre>
+            </div>
+
+            <h3>Card hover effect</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Prompt</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>Change the character card hover effect. Remove the scale and replace with:
+the card rises upward by 4px using transform: translateY(-4px),
+and adds a box-shadow below it using accent color at 20% opacity.</code></pre>
+            </div>
+
+            <h3>Background change</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span class="code-lang">Prompt</span>
+                <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 1h8a1 1 0 011 1v10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  Copy
+                </button>
+              </div>
+              <pre><code>Change the page background. Instead of a solid dark color, use a very subtle
+radial gradient from a slightly lighter version at the center to a darker
+version at the edges. Keep the difference very subtle — about 10% contrast.</code></pre>
+            </div>
+          </article>
+
+          <article class="guide-section" id="s-checklist">
+            <h2>The Pre-Session Checklist</h2>
+            <p>Before starting any new theming session, run through this list:</p>
+            <ul>
+              <li>HTML file attached or ready to paste</li>
+              <li>skill.md attached or ready to paste</li>
+              <li>Previous CSS attached (if continuing from prior session)</li>
+              <li>Mobile layout goals written out specifically</li>
+              <li>Desktop layout goals written out specifically</li>
+              <li>Visual references collected (screenshots, descriptions, or URLs)</li>
+              <li>AI instructed to study all materials before writing any code</li>
+              <li>AI confirmed it has read the materials</li>
+              <li>Permissions block included in prompt</li>
+              <li>Output format specified (HTML block, CSS block, summary)</li>
+              <li>AI reminded to use pp-* and profile-* selectors from skill.md</li>
+              <li>AI instructed to provide FULL CSS file every time (not just changes)</li>
+              <li>Mobile and desktop layouts addressed in the prompt</li>
+              <li>Prompt reviewed for vague adjectives (replaced with specific descriptions)</li>
+              <li>Prompt reviewed for missing measurements (added where possible)</li>
+            </ul>
+
+            <div class="pullquote">
+              <p>The gap between a mediocre AI-generated theme and a stunning one is almost entirely in how clearly the creative direction was communicated.</p>
+            </div>
+
+            <p>The AI has all the technical skill you could need. What it lacks is your taste, your vision, and your specific aesthetic sense. Your job is to transmit those as precisely and completely as possible.</p>
+            <p>Every round of iteration is a round of getting better at communicating. Don't rush the process. Enjoy it. The conversation with the AI is part of the creative work.</p>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD SECTION -->
+  <section id="download" aria-labelledby="download-heading">
+    <div class="container">
+      <div class="download-inner">
+        <div class="download-text reveal">
+          <div class="mark-divider" aria-hidden="true">
+            <span class="mark-label">Get the file</span>
+          </div>
+          <h2 id="download-heading">One file. Everything you need.</h2>
+          <p>The skill.md contains a complete reverse-engineering of JanitorAI's CSS architecture — every stable selector, every component, every CSS variable, every risk and workaround documented.</p>
+          <p>Drop it into any AI session alongside your profile HTML and you're ready to build.</p>
+        </div>
+        <div class="reveal reveal-delay-1">
+          <div class="download-card" role="region" aria-label="Download skill.md">
+            <div class="file-icon" aria-hidden="true"></div>
+            <span class="file-name">skill.md</span>
+            <div class="file-meta">
+              <div class="file-meta-item">
+                <span class="file-meta-label">Type</span>
+                <span class="file-meta-value">Markdown</span>
+              </div>
+              <div class="file-meta-item">
+                <span class="file-meta-label">Version</span>
+                <span class="file-meta-value">1.0</span>
+              </div>
+              <div class="file-meta-item">
+                <span class="file-meta-label">Platform</span>
+                <span class="file-meta-value">JanitorAI</span>
+              </div>
+            </div>
+            <p class="file-desc">JanitorAI Profile Page — CSS Reverse Engineering &amp; Theme Override Reference. Covers DOM structure, CSS architecture, component inventory, stable selectors, CSS variables, layout system, specificity strategies, and future-proof maintenance.</p>
+            <a href="https://drive.google.com/file/d/1prDsBgFmka02vmeM6dh0hoOflOEZK-iG/view?usp=drivesdk" class="download-btn" target="_blank" rel="noopener" aria-label="Download skill.md from Google Drive" id="mainDownloadBtn">
+              <span class="download-btn-label">Download skill.md</span>
+              <span class="download-btn-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 2v8M4 7l4 4 4-4M2 13h12" stroke="rgba(6,6,6,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+  <!-- RESOURCES SECTION -->
+  <section id="resources" aria-labelledby="resources-heading">
+    <div class="container">
+      <div class="resources-header reveal">
+        <div class="mark-divider" aria-hidden="true">
+          <span class="mark-label">Helpful Resources</span>
+        </div>
+        <h2 id="resources-heading">Go further.</h2>
+        <p>Walkthroughs, breakdowns, and reference lists from the community. Watch, study, and absorb techniques.</p>
+      </div>
+
+      <!-- Video resources -->
+      <div class="resources-grid">
+
+        <div class="resource-video-card" data-video-id="0hrJGWrCux0" role="button" tabindex="0" aria-label="Play Basic CSS Course">
+          <div class="resource-video-thumb">
+            <img src="https://img.youtube.com/vi/0hrJGWrCux0/maxresdefault.jpg" alt="Basic CSS Course thumbnail" loading="lazy"
+              onerror="this.onerror=null;this.src='https://img.youtube.com/vi/0hrJGWrCux0/hqdefault.jpg'">
+            <div class="resource-play-btn" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M4 2.5l7 4.5-7 4.5V2.5z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="resource-video-badge">YouTube</span>
+          </div>
+          <div class="resource-video-embed"></div>
+          <span class="resource-type-label">Video</span>
+          <h3>Basic CSS Course</h3>
+          <p>A solid foundational walkthrough of CSS concepts. Good for understanding what the AI is actually generating, so you can critique it more precisely.</p>
+          <span class="resource-link-label resource-play-label">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2 1.5l6 3.5-6 3.5V1.5z" fill="currentColor"/></svg>
+            Play inline
+          </span>
+          <a href="https://youtu.be/0hrJGWrCux0" class="resource-yt-link" target="_blank" rel="noopener" aria-label="Open on YouTube">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            YouTube
+          </a>
+        </div>
+
+        <div class="resource-video-card" data-video-id="wRNinF7YQqQ" role="button" tabindex="0" aria-label="Play Bro Code CSS Full Course">
+          <div class="resource-video-thumb">
+            <img src="https://img.youtube.com/vi/wRNinF7YQqQ/maxresdefault.jpg" alt="Bro Code CSS Walkthrough thumbnail" loading="lazy"
+              onerror="this.onerror=null;this.src='https://img.youtube.com/vi/wRNinF7YQqQ/hqdefault.jpg'">
+            <div class="resource-play-btn" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M4 2.5l7 4.5-7 4.5V2.5z" fill="currentColor"/>
+              </svg>
+            </div>
+            <span class="resource-video-badge">YouTube</span>
+          </div>
+          <div class="resource-video-embed"></div>
+          <span class="resource-type-label">Video</span>
+          <h3>Bro Code — CSS Full Course</h3>
+          <p>A comprehensive CSS course covering everything from box model to flexbox and animations. Great reference to watch alongside your theming sessions.</p>
+          <span class="resource-link-label resource-play-label">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M2 1.5l6 3.5-6 3.5V1.5z" fill="currentColor"/></svg>
+            Play inline
+          </span>
+          <a href="https://youtu.be/wRNinF7YQqQ" class="resource-yt-link" target="_blank" rel="noopener" aria-label="Open on YouTube">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            YouTube
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Website resources -->
+      <div class="resources-sites">
+
+        <a href="https://rentry.co/jaielements" class="resource-site-card" target="_blank" rel="noopener" aria-label="Read Puppy's Jai Page Breakdown">
+          <div class="resource-site-info">
+            <span class="resource-site-label">Reference</span>
+            <h3>Puppy's Jai Page Breakdown</h3>
+            <p>A detailed breakdown of JanitorAI page elements — what they are, how they work, and how to target them.</p>
+          </div>
+          <div class="resource-site-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </a>
+
+        <a href="https://jai-css-guide-resources.ju.mp" class="resource-site-card" target="_blank" rel="noopener" aria-label="View Jai CSS Resource List">
+          <div class="resource-site-info">
+            <span class="resource-site-label">Resource List</span>
+            <h3>Jai CSS Resource List</h3>
+            <p>A curated collection of CSS resources, tools, and references put together specifically for JanitorAI profile styling.</p>
+          </div>
+          <div class="resource-site-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span class="footer-brand">By <strong>Lucid</strong></span>
+      <span class="footer-copy">VibeCode CSS — JanitorAI Profile Theme System</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// HERO PARALLAX
+// ============================================================
+const heroInner = document.querySelector('.hero-inner');
+const heroSection = document.getElementById('hero');
+let ticking = false;
+
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      const y = window.scrollY;
+      const vh = window.innerHeight;
+      if (heroInner && y < vh) {
+        const progress = y / (vh * 0.65);
+        heroInner.style.transform = `translateY(${y * 0.2}px) scale(${1 - progress * 0.02})`;
+        heroInner.style.opacity = Math.max(0, 1 - progress * 1.05);
+      }
+      ticking = false;
+    });
+    ticking = true;
+  }
+}, { passive: true });
+
+// ============================================================
+// LOADER
+// ============================================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+    // Trigger hero eyebrow line after loader
+    setTimeout(() => {
+      const eyebrow = document.querySelector('.hero-eyebrow');
+      if (eyebrow) eyebrow.classList.add('line-extended');
+    }, 200);
+  }, 3400);
+});
+
+// ============================================================
+// NAV SCROLL STATE
+// ============================================================
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ============================================================
+// READING PROGRESS
+// ============================================================
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  progress.style.width = pct + '%';
+}, { passive: true });
+
+// ============================================================
+// CURSOR SPOTLIGHT
+// ============================================================
+const cursorSpot = document.getElementById('cursorSpot');
+let spotX = window.innerWidth / 2, spotY = window.innerHeight / 2;
+let currentSpotX = spotX, currentSpotY = spotY;
+let spotRaf = null;
+
+document.addEventListener('mousemove', (e) => {
+  spotX = e.clientX;
+  spotY = e.clientY;
+  if (!spotRaf) {
+    spotRaf = requestAnimationFrame(animateSpot);
+  }
+});
+
+function lerpVal(a, b, t) { return a + (b - a) * t; }
+
+function animateSpot() {
+  currentSpotX = lerpVal(currentSpotX, spotX, 0.065);
+  currentSpotY = lerpVal(currentSpotY, spotY, 0.065);
+  cursorSpot.style.left = currentSpotX + 'px';
+  cursorSpot.style.top = currentSpotY + 'px';
+  const dist = Math.hypot(currentSpotX - spotX, currentSpotY - spotY);
+  if (dist > 0.5) {
+    spotRaf = requestAnimationFrame(animateSpot);
+  } else {
+    spotRaf = null;
+  }
+}
+
+// ============================================================
+// CONCEPT CARD MAGNETIC GRADIENT
+// ============================================================
+document.querySelectorAll('.concept-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const mx = ((e.clientX - rect.left) / rect.width * 100).toFixed(1) + '%';
+    const my = ((e.clientY - rect.top) / rect.height * 100).toFixed(1) + '%';
+    card.style.setProperty('--mx', mx);
+    card.style.setProperty('--my', my);
+  });
+});
+
+// ============================================================
+// INTERSECTION OBSERVER — REVEAL + TOC + SHIMMER
+// ============================================================
+const revealEls = document.querySelectorAll('.reveal, .guide-section');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.06, rootMargin: '0px 0px -48px 0px' });
+
+revealEls.forEach(el => revealObserver.observe(el));
+
+// Observe download card
+const dlCard = document.querySelector('.download-card');
+if (dlCard) revealObserver.observe(dlCard);
+
+// TOC active
+const tocItems = document.querySelectorAll('.toc-item[data-target]');
+const sections = document.querySelectorAll('.guide-section[id]');
+
+const tocObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      tocItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.target === id);
+      });
+    }
+  });
+}, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
+
+sections.forEach(s => tocObserver.observe(s));
+
+// ============================================================
+// TOAST SYSTEM
+// ============================================================
+function showToast(message) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<div class="toast-dot"></div><span>${message}</span>`;
+  toast.setAttribute('role', 'status');
+  container.appendChild(toast);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => toast.classList.add('show'));
+  });
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 500);
+  }, 2800);
+}
+
+// ============================================================
+// COPY CODE BLOCKS
+// ============================================================
+function copyCode(btn) {
+  const block = btn.closest('.code-block');
+  const code = block.querySelector('code');
+  const text = code.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const origHTML = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied`;
+    showToast('Copied to clipboard');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = origHTML;
+    }, 2000);
+  }).catch(() => {
+    showToast('Could not copy — please select manually');
+  });
+}
+
+// ============================================================
+// DOWNLOAD CLICK FEEDBACK
+// ============================================================
+document.querySelectorAll('[id$="DownloadBtn"], .download-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    showToast('Opening Google Drive…');
+  });
+});
+
+// ============================================================
+// SEARCH — full implementation with jump + count
+// ============================================================
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+const searchNav = document.getElementById('searchNav');
+const searchCount = document.getElementById('searchCount');
+const searchPrev = document.getElementById('searchPrev');
+const searchNext = document.getElementById('searchNext');
+const guideContent = document.getElementById('guideContent');
+let originalContent = null;
+let allMatches = [];
+let currentMatchIndex = 0;
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightText(node, query) {
+  if (node.nodeType === 3) {
+    const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+    if (regex.test(node.textContent)) {
+      const span = document.createElement('span');
+      span.innerHTML = node.textContent.replace(regex, '<mark class="search-mark">$1</mark>');
+      node.parentNode.replaceChild(span, node);
+    }
+    return;
+  }
+  if (['SCRIPT','STYLE','BUTTON','CODE'].includes(node.nodeName)) return;
+  Array.from(node.childNodes).forEach(child => highlightText(child, query));
+}
+
+function updateMatchDisplay() {
+  allMatches = Array.from(guideContent.querySelectorAll('mark.search-mark'));
+  // Reset active
+  allMatches.forEach(m => m.classList.remove('active-match'));
+  if (allMatches.length === 0) {
+    searchNav.classList.remove('visible');
+    searchCount.textContent = '0 results';
+    searchCount.classList.add('visible');
+    return;
+  }
+  if (currentMatchIndex >= allMatches.length) currentMatchIndex = 0;
+  allMatches[currentMatchIndex].classList.add('active-match');
+  allMatches[currentMatchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  searchCount.textContent = `${currentMatchIndex + 1} / ${allMatches.length}`;
+  searchCount.classList.add('visible');
+  searchNav.classList.add('visible');
+}
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim();
+  searchClear.classList.toggle('visible', q.length > 0);
+
+  if (!q) {
+    if (originalContent) {
+      guideContent.innerHTML = originalContent;
+      rebindCopyButtons();
+      originalContent = null;
+    }
+    allMatches = [];
+    currentMatchIndex = 0;
+    searchNav.classList.remove('visible');
+    searchCount.classList.remove('visible');
+    return;
+  }
+
+  if (!originalContent) {
+    originalContent = guideContent.innerHTML;
+  }
+
+  guideContent.innerHTML = originalContent;
+  highlightText(guideContent, q);
+  rebindCopyButtons();
+  currentMatchIndex = 0;
+  updateMatchDisplay();
+});
+
+searchNext.addEventListener('click', () => {
+  if (!allMatches.length) return;
+  currentMatchIndex = (currentMatchIndex + 1) % allMatches.length;
+  allMatches.forEach(m => m.classList.remove('active-match'));
+  allMatches[currentMatchIndex].classList.add('active-match');
+  allMatches[currentMatchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  searchCount.textContent = `${currentMatchIndex + 1} / ${allMatches.length}`;
+});
+
+searchPrev.addEventListener('click', () => {
+  if (!allMatches.length) return;
+  currentMatchIndex = (currentMatchIndex - 1 + allMatches.length) % allMatches.length;
+  allMatches.forEach(m => m.classList.remove('active-match'));
+  allMatches[currentMatchIndex].classList.add('active-match');
+  allMatches[currentMatchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  searchCount.textContent = `${currentMatchIndex + 1} / ${allMatches.length}`;
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchClear.classList.remove('visible');
+  if (originalContent) {
+    guideContent.innerHTML = originalContent;
+    rebindCopyButtons();
+    originalContent = null;
+  }
+  allMatches = [];
+  currentMatchIndex = 0;
+  searchNav.classList.remove('visible');
+  searchCount.classList.remove('visible');
+  searchInput.focus();
+});
+
+// Keyboard navigation
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      searchPrev.click();
+    } else {
+      searchNext.click();
+    }
+  }
+  if (e.key === 'Escape') {
+    searchClear.click();
+  }
+});
+
+function rebindCopyButtons() {
+  guideContent.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.onclick = function() { copyCode(this); };
+  });
+  document.querySelectorAll('.guide-section').forEach(s => {
+    s.classList.add('visible');
+  });
+  // Re-stagger list items as already visible
+  document.querySelectorAll('.guide-section li').forEach(li => {
+    li.style.opacity = '1';
+    li.style.transform = 'none';
+  });
+}
+
+// ============================================================
+// CURSOR MAGNETIC EFFECT ON BUTTONS
+// ============================================================
+document.querySelectorAll('.btn-primary, .btn-secondary, .download-btn').forEach(btn => {
+  let currentX = 0, currentY = 0;
+  let targetX = 0, targetY = 0;
+  let rafId = null;
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function animate() {
+    currentX = lerp(currentX, targetX, 0.12);
+    currentY = lerp(currentY, targetY, 0.12);
+    btn.style.transform = `translate(${currentX}px, ${currentY}px)`;
+    if (Math.abs(currentX - targetX) > 0.01 || Math.abs(currentY - targetY) > 0.01) {
+      rafId = requestAnimationFrame(animate);
+    } else {
+      rafId = null;
+    }
+  }
+
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    targetX = (e.clientX - rect.left - rect.width / 2) * 0.1;
+    targetY = (e.clientY - rect.top - rect.height / 2) * 0.1;
+    if (!rafId) rafId = requestAnimationFrame(animate);
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    targetX = 0;
+    targetY = 0;
+    if (!rafId) rafId = requestAnimationFrame(animate);
+  });
+});
+
+// ============================================================
+// BOUNCY HOVER — concept cards pop
+// ============================================================
+
+// ============================================================
+// SCROLL-DRIVEN BLUR REVEAL
+// Elements sharpen continuously as they scroll into view.
+// Once fully sharp, we clear inline styles and hand control
+// back to CSS (so hover transforms work normally).
+// ============================================================
+const blurTargets = document.querySelectorAll('.guide-section, .reveal, .concept-card, .callout, .pullquote, .code-block');
+const blurSharpened = new WeakSet();
+
+function updateBlurReveal() {
+  const vh = window.innerHeight;
+  blurTargets.forEach(el => {
+    if (blurSharpened.has(el)) return;
+    const rect = el.getBoundingClientRect();
+    const fromBottom = rect.top / vh; // 1 = at viewport bottom, 0 = at top
+
+    if (fromBottom > 1.05) {
+      el.style.filter = 'blur(14px)';
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(22px)';
+    } else if (fromBottom <= 0.65) {
+      // Fully sharp — clear inline, let CSS + hover take over
+      el.style.filter = '';
+      el.style.opacity = '';
+      el.style.transform = '';
+      el.classList.add('visible');
+      blurSharpened.add(el);
+    } else {
+      // Transition zone: fromBottom 1.05 → 0.65 (range 0.40)
+      const t = (fromBottom - 0.65) / 0.40; // 1 at bottom, 0 when clear
+      const eased = t * t * (3 - 2 * t); // smoothstep
+      el.style.filter = `blur(${(eased * 14).toFixed(2)}px)`;
+      el.style.opacity = (1 - eased * 0.92).toFixed(3);
+      el.style.transform = `translateY(${(eased * 22).toFixed(2)}px)`;
+    }
+  });
+}
+
+let blurRaf = null;
+window.addEventListener('scroll', () => {
+  if (!blurRaf) {
+    blurRaf = requestAnimationFrame(() => {
+      updateBlurReveal();
+      blurRaf = null;
+    });
+  }
+}, { passive: true });
+
+requestAnimationFrame(updateBlurReveal);
+
+// ============================================================
+// HAMBURGER MENU
+// ============================================================
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const hamburgerMenu = document.getElementById('hamburgerMenu');
+const menuBackdrop = document.getElementById('menuBackdrop');
+const menuCloseBtn = document.getElementById('menuCloseBtn');
+
+function openMenu() {
+  hamburgerBtn.classList.add('open');
+  hamburgerBtn.setAttribute('aria-expanded', 'true');
+  hamburgerMenu.classList.add('open');
+  hamburgerMenu.setAttribute('aria-hidden', 'false');
+  menuBackdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('nav').classList.add('menu-open');
+}
+
+function closeMenu() {
+  hamburgerBtn.classList.remove('open');
+  hamburgerBtn.setAttribute('aria-expanded', 'false');
+  hamburgerMenu.classList.remove('open');
+  hamburgerMenu.setAttribute('aria-hidden', 'true');
+  menuBackdrop.classList.remove('open');
+  document.body.style.overflow = '';
+  if (window.scrollY <= 10) {
+    document.getElementById('nav').classList.remove('menu-open');
+  }
+}
+
+hamburgerBtn.addEventListener('click', () => {
+  if (hamburgerMenu.classList.contains('open')) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+});
+
+if (menuCloseBtn) menuCloseBtn.addEventListener('click', closeMenu);
+
+menuBackdrop.addEventListener('click', closeMenu);
+
+// Close on any menu link click (after scroll begins)
+hamburgerMenu.querySelectorAll('.menu-link').forEach(link => {
+  link.addEventListener('click', () => {
+    // Small delay so the scroll starts before the panel closes
+    setTimeout(closeMenu, 80);
+  });
+});
+
+// Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && hamburgerMenu.classList.contains('open')) {
+    closeMenu();
+  }
+});
+
+// ============================================================
+// VIDEO EMBED — click thumbnail to play inline
+// ============================================================
+document.querySelectorAll('.resource-video-card[data-video-id]').forEach(card => {
+  const videoId = card.dataset.videoId;
+  const embed = card.querySelector('.resource-video-embed');
+  const playLabel = card.querySelector('.resource-play-label');
+  const ytLink = card.querySelector('.resource-yt-link');
+
+  function activateEmbed(e) {
+    // Don't intercept clicks on the external YouTube link
+    if (ytLink && ytLink.contains(e.target)) return;
+
+    if (card.classList.contains('playing')) return;
+
+    // Build iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+    iframe.title = card.querySelector('h3')?.textContent || 'YouTube video';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    embed.appendChild(iframe);
+
+    card.classList.add('playing');
+    if (playLabel) playLabel.textContent = 'Now playing';
+  }
+
+  card.addEventListener('click', activateEmbed);
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateEmbed(e); }
+  });
+});
+
+
+const resourceCardObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+document.querySelectorAll('.resource-video-card, .resource-site-card').forEach((card, i) => {
+  card.style.transitionDelay = `${0.06 + i * 0.10}s`;
+  resourceCardObserver.observe(card);
+});
+</script>
+</body>
+</html>
